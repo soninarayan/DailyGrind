@@ -1,0 +1,32 @@
+name: Automated Daily Push
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # Runs every 6 hours
+  workflow_dispatch: # Allows manual trigger
+
+permissions:
+  contents: write # Explicitly grant write permission to repository contents
+
+jobs:
+  push_changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "Rohith Reddy Depa"
+          git config --global user.email "rohithreddydepa@gmail.com"
+
+      - name: Update daily file
+        run: |
+          echo "Last updated: $(date)" >> daily-update.txt
+
+      - name: Commit and push if changed
+        run: |
+          git add daily-update.txt
+          git diff --quiet && git diff --staged --quiet || git commit -m "Automated update on $(date)"
+          git push
